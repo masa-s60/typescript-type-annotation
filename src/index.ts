@@ -17,8 +17,8 @@ class ObjectWrapper {
    * @return Object
    */
   get obj(): stringKeyAndValue {
-    const obj_copy = this._obj;
-    return obj_copy;
+    const obj1Copy = this._obj;
+    return obj1Copy;
   }
 
   /**
