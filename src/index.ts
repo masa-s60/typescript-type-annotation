@@ -1,24 +1,21 @@
-type stringKeyAndValue = {
-  [key: string]: string
-}
 
-class ObjectWrapper {
+class ObjectWrapper<T extends newObj<T> > {
   private _obj;
-  
   /***
    * 引数のオブジェクトのコピーを this._objに設定
    */
-  constructor(_object: stringKeyAndValue) {
-    this._obj = _object;
+  constructor(_obj: T) {
+    const copy_obj = Object.assign({}, _obj);
+    this._obj = copy_obj;
   }
 
   /**
    * this._objのコピーを返却
    * @return Object
    */
-  get obj(): stringKeyAndValue {
-    const obj1Copy = this._obj;
-    return obj1Copy;
+  get obj(): T {
+    const copyThisObject = Object.assign({}, this._obj);
+    return copyThisObject;
   }
 
   /**
@@ -26,11 +23,11 @@ class ObjectWrapper {
    * @param key オブジェクトのキー
    * @param val オブジェクトの値
    */
-  set(key: obj1KeyType, val: obj1ValueType): boolean | undefined {
-    if(!(key in this._obj)) {
+  set(key: newObjKeyType<T>, val: T[keyof T]): boolean {
+    if(!(this._obj.hasOwnProperty(key as keyof T))) {
       return false;
     } else {
-      this._obj[key] = val
+      this._obj[key as keyof T] = val;
       return true;
     }
   }
@@ -39,23 +36,23 @@ class ObjectWrapper {
    * 指定のキーが存在しない場合 undefinedを返却
    * @param key オブジェクトのキー
    */
-  get(key: obj1KeyType): obj1KeyType | undefined {
-    if (!(key in this._obj)) {
+  get(key: newObjKeyType<T> ): undefined | newObjKeyType<T> {
+    if (!(this._obj.hasOwnProperty(key as keyof T))) {
       return undefined;
     } else {
-      const obj1KeyCopy = this._obj[key]
-      return obj1KeyCopy;
+      const copyThisObject = Object.assign({}, this._obj);
+      return copyThisObject[key as keyof T];
     }
   }
 
   /**
    * 指定した値を持つkeyの配列を返却。該当のものがなければ空の配列を返却。
    */
-  findKeys(val: obj2ValueType): obj2ValueType[] {
-    const targetKeysArray: string[] = [];
+  findKeys(val: T[keyof T]): T[keyof T][] {
+    const targetKeysArray: T[keyof T][] = [];
     for (const [key, value] of Object.entries(this._obj)) {
       if(value === val) {
-        targetKeysArray.push(key);
+        targetKeysArray.push(key as T[keyof T]);
       }
     }
     return targetKeysArray;
@@ -66,10 +63,17 @@ class ObjectWrapper {
  * check script
  * 完成したら、以下のスクリプトがすべてOKになる。
  */
-const obj1: stringKeyAndValue = { a: '01', b: '02' };
-const wrappedObj1: ObjectWrapper = new ObjectWrapper(obj1);
-type obj1KeyType = keyof typeof obj1;
-type obj1ValueType = typeof obj1[keyof typeof obj1];
+
+//  type obj = Record<string, string>;
+
+type newObj<T> = {
+  [key in keyof T]: T[key];
+}
+
+type newObjKeyType<T> = T extends {[key in keyof T]: infer key} ? key : string;
+
+const obj1 = { a: '01', b: '02'};
+const wrappedObj1 = new ObjectWrapper<typeof obj1>(obj1);
 if (wrappedObj1.obj.a === '01') {
   console.log('OK: get obj()');
 } else {
@@ -92,10 +96,9 @@ if (wrappedObj1.get('b') === '04' && wrappedObj1.get('c') === undefined) {
   console.error('NG: get(key)');
 }
 
-const obj2: stringKeyAndValue = { a: '01', b: '02', bb: '02', bbb: '02' };
-const wrappedObj2: ObjectWrapper = new ObjectWrapper(obj2);
-type obj2ValueType = typeof obj2[keyof typeof obj2];
-const keys: string[] = wrappedObj2.findKeys('02');
+const obj2 = { a: '01', b: '02', bb: '02', bbb: '02' };
+const wrappedObj2 = new ObjectWrapper<typeof obj2>(obj2);
+const keys = wrappedObj2.findKeys('02');
 if (
   wrappedObj2.findKeys('03').length === 0 &&
   keys.includes('b') &&
