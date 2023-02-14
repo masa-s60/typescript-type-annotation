@@ -24,25 +24,17 @@ class ObjectWrapper<T extends newObj<T> > {
    * @param val オブジェクトの値
    */
   set(key: newObjKeyType<T>, val: T[keyof T]): boolean {
-    if(!(this._obj.hasOwnProperty(key as keyof T))) {
-      return false;
-    } else {
-      this._obj[key as keyof T] = val;
-      return true;
-    }
+    this._obj[key as keyof T] = val;
+    return true;
   }
   /**
    * 指定したキーの値のコピーを返却
    * 指定のキーが存在しない場合 undefinedを返却
    * @param key オブジェクトのキー
    */
-  get(key: newObjKeyType<T> ): undefined | newObjKeyType<T> {
-    if (!(this._obj.hasOwnProperty(key as keyof T))) {
-      return undefined;
-    } else {
-      const copyThisObject = Object.assign({}, this._obj);
-      return copyThisObject[key as keyof T];
-    }
+  get(key: newObjKeyType<T>): undefined | newObjKeyType<T> {
+    const copyThisObject = Object.assign({}, this._obj);
+    return copyThisObject[key as keyof T];
   }
 
   /**
