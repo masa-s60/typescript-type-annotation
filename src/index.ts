@@ -32,7 +32,7 @@ class ObjectWrapper<T extends newObj<T> > {
    * 指定のキーが存在しない場合 undefinedを返却
    * @param key オブジェクトのキー
    */
-  get(key: newObjKeyType<T>): undefined | newObjKeyType<T> {
+  get(key: newObjKeyType<T>): newObjKeyType<T> {
     const copyThisObject = Object.assign({}, this._obj);
     return copyThisObject[key as keyof T];
   }
